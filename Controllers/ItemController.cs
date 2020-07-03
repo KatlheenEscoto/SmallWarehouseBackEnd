@@ -2,55 +2,109 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmallWarehouseBackEnd.Contexts;
 using SmallWarehouseBackEnd.Models;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace SmallWarehouseBackEnd.Controllers
 {
     [Route("api/[controller]")]
-    public class ItemController : Controller
+    [ApiController]
+    public class ItemController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly AppDbContext _context;
 
         public ItemController(AppDbContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
-        // GET: api/<controller>
+        // GET: api/Item
         [HttpGet]
-        public IEnumerable<Item> Get()
+        public async Task<ActionResult<IEnumerable<Item>>> GetItem()
         {
-            return context.Item.ToList();
+            return await _context.Item.ToListAsync();
         }
 
-        // GET api/<controller>/5
+        // GET: api/Item/5
         [HttpGet("{id}")]
-        public Item Get(int id)
+        public async Task<ActionResult<Item>> GetItem(int id)
         {
-            var item = context.Item.FirstOrDefault(i => i.item_id == id);
+            var item = await _context.Item.FindAsync(id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
             return item;
         }
 
-        // POST api/<controller>
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/<controller>/5
+        // PUT: api/Item/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> PutItem(int id, Item item)
         {
+            if (id != item.item_id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(item).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ItemExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // POST: api/Item
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
+        public async Task<ActionResult<Item>> PostItem(Item item)
         {
+            _context.Item.Add(item);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetItem", new { id = item.item_id }, item);
+        }
+
+        // DELETE: api/Item/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Item>> DeleteItem(int id)
+        {
+            var item = await _context.Item.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            _context.Item.Remove(item);
+            await _context.SaveChangesAsync();
+
+            return item;
+        }
+
+        private bool ItemExists(int id)
+        {
+            return _context.Item.Any(e => e.item_id == id);
         }
     }
 }
