@@ -42,44 +42,68 @@ namespace SmallWarehouseBackEnd.Controllers
             return item;
         }
 
-        // PUT: api/Item/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutItem(int id, Item item)
+        private bool ItemExists(int id)
         {
-            if (id != item.item_id)
+            return _context.Item.Any(e => e.item_id == id);
+        }
+
+        /*
+         *       
+         *
+         * 
+         * 
+         */
+
+        // Custom functions. c:
+
+        // GET: api/Item/active
+        [HttpGet("active")]
+        public async Task<ActionResult<IEnumerable<Item>>> GetActiveItem()
+        {
+            return await _context.Item.Where(i => i.item_status == 1).ToListAsync();
+        }
+
+        // GET: api/Item/inactive
+        [HttpGet("inactive")]
+        public async Task<ActionResult<IEnumerable<Item>>> GetInactiveItem()
+        {
+            return await _context.Item.Where(i => i.item_status == 0).ToListAsync();
+        }
+
+        // PUT: api/Item/5
+        // Modificar Item.
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Item>> PutItem(int id, Item item_new)
+        {
+
+            var item_old = await _context.Item.FindAsync(id);
+            if (item_old == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(item).State = EntityState.Modified;
+            item_old.item_sku = item_new.item_sku;
+            item_old.item_description = item_new.item_description;
+            item_old.item_qty = item_new.item_qty;
+            item_old.item_status = item_new.item_status;
 
             try
             {
                 await _context.SaveChangesAsync();
+                return item_old;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException) when (!ItemExists(id))
             {
-                if (!ItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
-
-            return NoContent();
         }
 
         // POST: api/Item
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // Agregar Item.
         [HttpPost]
         public async Task<ActionResult<Item>> PostItem(Item item)
         {
+            item.item_status = 1;
             _context.Item.Add(item);
             await _context.SaveChangesAsync();
 
@@ -90,21 +114,51 @@ namespace SmallWarehouseBackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Item>> DeleteItem(int id)
         {
-            var item = await _context.Item.FindAsync(id);
-            if (item == null)
+
+            /* Dar de baja un item determinado. item_status = 0 */
+
+            var item_delete = await _context.Item.FindAsync(id);
+            if (item_delete == null)
+            {
+                return NotFound();
+            }
+            item_delete.item_status = 0;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return item_delete;
+            }
+            catch (DbUpdateConcurrencyException) when (!ItemExists(id))
+            {
+                return NotFound();
+            }
+        }
+
+        // PUT: api/Item/stock/5
+        [HttpPut("stock/{id}")]
+        public async Task<ActionResult<Item>> UpdateItemQty(int id, Item item_new)
+        {
+
+            /* Dar de baja un item determinado. item_status = 0 */
+
+            var item_old = await _context.Item.FindAsync(id);
+            if (item_old == null)
             {
                 return NotFound();
             }
 
-            _context.Item.Remove(item);
-            await _context.SaveChangesAsync();
+            item_old.item_qty = item_new.item_qty;
 
-            return item;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return item_old;
+            }
+            catch (DbUpdateConcurrencyException) when (!ItemExists(id))
+            {
+                return NotFound();
+            }
         }
 
-        private bool ItemExists(int id)
-        {
-            return _context.Item.Any(e => e.item_id == id);
-        }
     }
 }

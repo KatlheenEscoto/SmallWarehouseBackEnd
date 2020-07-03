@@ -107,4 +107,15 @@ namespace SmallWarehouseBackEnd.Controllers
             return _context.Orden_Details.Any(e => e.orden_details_id == id);
         }
     }
+
+    /*
+     *       
+     *
+     * 
+     * 
+     */
+
+    // Custom functions. c:
+
+
 }
