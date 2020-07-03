@@ -1,0 +1,9 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\HP CORE I7 8TH GEN\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\HP CORE I7 8TH GEN\\.nuget\\packages",
+      "C:\\Microsoft\\Xamarin\\NuGet"
+    ]
+  }
+}
