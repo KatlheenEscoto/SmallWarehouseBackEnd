@@ -13,5 +13,6 @@ namespace SmallWarehouseBackEnd.Models
         public string item_sku{ get; set; }
         public string item_description { get; set; }
         public int item_qty { get; set; }
+        public int item_status { get; set; }
     }
 }
