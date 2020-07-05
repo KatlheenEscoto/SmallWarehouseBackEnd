@@ -42,38 +42,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return orden;
         }
 
-        // PUT: api/Orden/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrden(int id, Orden orden)
-        {
-            if (id != orden.orden_id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(orden).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrdenExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         private bool OrdenExists(int id)
         {
             return _context.Orden.Any(e => e.orden_id == id);
@@ -114,7 +82,7 @@ namespace SmallWarehouseBackEnd.Controllers
             }
 
             orden_delete.orden_status = 0; // Orden cancelada.
-            var orden_details = await _context.Orden_Details.Where( d => d.orden_id  == orden_delete.orden_id).ToListAsync();
+            var orden_details = await _context.Orden_Details.Where( d => d.orden_id  == orden_delete.orden_id && d.orden_details_status == 1).ToListAsync();
             foreach (var detail in orden_details)
             {
                 var item = await _context.Item.FindAsync(detail.item_id);
@@ -135,6 +103,37 @@ namespace SmallWarehouseBackEnd.Controllers
                 return NotFound();
             }
         }
+
+        // PUT: api/orden/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Orden>> PutOrden(int id)
+        {
+
+            /* Comprar una orden */
+            var orden = await _context.Orden.FindAsync(id);
+            if (orden == null)
+            {
+                return NotFound("La orden no existe.");
+            }
+
+            orden.orden_status = 2; // Orden comprada.
+            var orden_details = await _context.Orden_Details.Where(d => d.orden_id == orden.orden_id && d.orden_details_status == 1).ToListAsync();
+            foreach (var detail in orden_details)
+            {
+                detail.orden_details_status = 2; // Estado comprado.
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return orden;
+            }
+            catch (DbUpdateConcurrencyException) when (!OrdenExists(id))
+            {
+                return NotFound();
+            }
+        }
+
 
 
     }

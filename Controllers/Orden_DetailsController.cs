@@ -42,38 +42,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return orden_Details;
         }
 
-        // PUT: api/Orden_Details/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrden_Details(int id, Orden_Details orden_Details)
-        {
-            if (id != orden_Details.orden_details_id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(orden_Details).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!Orden_DetailsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         private bool Orden_DetailsExists(int id)
         {
             return _context.Orden_Details.Any(e => e.orden_details_id == id);
