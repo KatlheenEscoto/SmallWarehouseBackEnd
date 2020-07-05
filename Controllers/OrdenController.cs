@@ -74,22 +74,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Orden/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Orden>> DeleteOrden(int id)
-        {
-            var orden = await _context.Orden.FindAsync(id);
-            if (orden == null)
-            {
-                return NotFound();
-            }
-
-            _context.Orden.Remove(orden);
-            await _context.SaveChangesAsync();
-
-            return orden;
-        }
-
         private bool OrdenExists(int id)
         {
             return _context.Orden.Any(e => e.orden_id == id);
@@ -115,6 +99,41 @@ namespace SmallWarehouseBackEnd.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrden", new { id = orden.orden_id }, orden);
+        }
+
+        // DELETE: api/orden/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Orden>> DeleteOrden(int id)
+        {
+
+            /* Cancelar una orden */
+            var orden_delete = await _context.Orden.FindAsync(id);
+            if (orden_delete == null)
+            {
+                return NotFound("La orden no existe.");
+            }
+
+            orden_delete.orden_status = 0; // Orden cancelada.
+            var orden_details = await _context.Orden_Details.Where( d => d.orden_id  == orden_delete.orden_id).ToListAsync();
+            foreach (var detail in orden_details)
+            {
+                var item = await _context.Item.FindAsync(detail.item_id);
+                if(item.item_id == detail.item_id)
+                {
+                    item.item_qty = item.item_qty + detail.orden_details_qty; // Modificando el stock.
+                }
+                detail.orden_details_status = 0; // Estado cancelada.
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return orden_delete;
+            }
+            catch (DbUpdateConcurrencyException) when (!OrdenExists(id))
+            {
+                return NotFound();
+            }
         }
 
 

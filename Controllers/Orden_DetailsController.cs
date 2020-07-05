@@ -128,10 +128,15 @@ namespace SmallWarehouseBackEnd.Controllers
             /* Cancelando una determinada orden de producto. */
             var orden_details_delete = await _context.Orden_Details.FindAsync(id);
             var item = await _context.Item.FindAsync(orden_details_delete.item_id);
+            var orden = await _context.Orden.FindAsync(orden_details_delete.orden_id);
 
             if (orden_details_delete == null)
             {
                 return NotFound("El detalle de orden no existe.");
+            } 
+            else if(orden.orden_status != 1)
+            {
+                return BadRequest("La orden debe estar en proceso, no cancelada ni pagada para cancelar artículo.");
             }
 
             item.item_qty = item.item_qty + orden_details_delete.orden_details_qty; // Modificando el stock.
