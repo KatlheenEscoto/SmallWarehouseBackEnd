@@ -11,8 +11,6 @@ namespace SmallWarehouseBackEnd.Models
     {
         [Key]
         public int item_id { get; set; }
-
-        [Required(ErrorMessage = "Por favor teclea el campo item_sku.")]
         public string item_sku{ get; set; }
         public string item_description { get; set; }
         public int item_qty { get; set; }

@@ -74,18 +74,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return NoContent();
         }
 
-        // POST: api/Orden_Details
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Orden_Details>> PostOrden_Details(Orden_Details orden_Details)
-        {
-            _context.Orden_Details.Add(orden_Details);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOrden_Details", new { id = orden_Details.orden_details_id }, orden_Details);
-        }
-
         // DELETE: api/Orden_Details/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Orden_Details>> DeleteOrden_Details(int id)
@@ -106,16 +94,41 @@ namespace SmallWarehouseBackEnd.Controllers
         {
             return _context.Orden_Details.Any(e => e.orden_details_id == id);
         }
+
+
+        /*
+         *       
+         *
+         * 
+         * 
+         */
+
+        // Custom functions. c:
+
+        // POST: api/Orden_Details
+        // Agregar detalle de orden.
+        [HttpPost]
+        public async Task<ActionResult<Orden_Details>> PostOrden_Details(Orden_Details orden_details)
+        {
+            // Verificando si existen las claves foraneas.
+            var item = await _context.Item.FindAsync(orden_details.item_id);
+            var orden = await _context.Orden.FindAsync(orden_details.orden_id);
+            if (item == null || orden == null)
+            {
+                return NotFound();
+            }
+            if (orden_details.orden_details_qty <= 0 || orden.orden_status != 1) // Tiene que comprar algo y la orden debe estar en proceso (1).
+            {
+                return BadRequest(); 
+            }
+            orden_details.orden_details_status = 1; // En proceso de compra.
+            _context.Orden_Details.Add(orden_details);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetOrden_Details", new { id = orden_details.orden_details_id }, orden_details);
+
+
+        }
+
     }
-
-    /*
-     *       
-     *
-     * 
-     * 
-     */
-
-    // Custom functions. c:
-
-
 }

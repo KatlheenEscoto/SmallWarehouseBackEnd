@@ -74,18 +74,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return NoContent();
         }
 
-        // POST: api/Orden
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Orden>> PostOrden(Orden orden)
-        {
-            _context.Orden.Add(orden);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOrden", new { id = orden.orden_id }, orden);
-        }
-
         // DELETE: api/Orden/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Orden>> DeleteOrden(int id)
@@ -106,5 +94,29 @@ namespace SmallWarehouseBackEnd.Controllers
         {
             return _context.Orden.Any(e => e.orden_id == id);
         }
+
+        /*
+         *       
+         *
+         * 
+         * 
+         */
+
+        // Custom functions. c:
+
+        // POST: api/orden
+        // Agregar Orden.
+        [HttpPost]
+        public async Task<ActionResult<Orden>> PostOrden(Orden orden)
+        {
+            orden.orden_total_qty = 0; // Todavía no ha comprado nada.
+            orden.orden_status = 1; // Orden en proceso de compra.
+            _context.Orden.Add(orden);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetOrden", new { id = orden.orden_id }, orden);
+        }
+
+
     }
 }
