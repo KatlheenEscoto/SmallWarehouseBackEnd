@@ -74,22 +74,6 @@ namespace SmallWarehouseBackEnd.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Orden_Details/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Orden_Details>> DeleteOrden_Details(int id)
-        {
-            var orden_Details = await _context.Orden_Details.FindAsync(id);
-            if (orden_Details == null)
-            {
-                return NotFound();
-            }
-
-            _context.Orden_Details.Remove(orden_Details);
-            await _context.SaveChangesAsync();
-
-            return orden_Details;
-        }
-
         private bool Orden_DetailsExists(int id)
         {
             return _context.Orden_Details.Any(e => e.orden_details_id == id);
@@ -134,8 +118,34 @@ namespace SmallWarehouseBackEnd.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrden_Details", new { id = orden_details.orden_details_id }, orden_details);
+        }
 
 
+        // DELETE: api/Orden_Details/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Orden_Details>> DeleteOrden_Details(int id)
+        {
+            /* Cancelando una determinada orden de producto. */
+            var orden_details_delete = await _context.Orden_Details.FindAsync(id);
+            var item = await _context.Item.FindAsync(orden_details_delete.item_id);
+
+            if (orden_details_delete == null)
+            {
+                return NotFound("El detalle de orden no existe.");
+            }
+
+            item.item_qty = item.item_qty + orden_details_delete.orden_details_qty; // Modificando el stock.
+            orden_details_delete.orden_details_status = 0; // Estado cancelada.
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return orden_details_delete;
+            }
+            catch (DbUpdateConcurrencyException) when (!Orden_DetailsExists(id))
+            {
+                return NotFound();
+            }
         }
 
     }

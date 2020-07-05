@@ -79,7 +79,7 @@ namespace SmallWarehouseBackEnd.Controllers
             var item_old = await _context.Item.FindAsync(id);
             if (item_old == null)
             {
-                return NotFound();
+                return NotFound("El item no existe.");
             }
 
             item_old.item_sku = item_new.item_sku;
@@ -120,7 +120,7 @@ namespace SmallWarehouseBackEnd.Controllers
             var item_delete = await _context.Item.FindAsync(id);
             if (item_delete == null)
             {
-                return NotFound();
+                return NotFound("El item no existe.");
             }
             item_delete.item_status = 0;
             try
@@ -144,7 +144,7 @@ namespace SmallWarehouseBackEnd.Controllers
             var item_old = await _context.Item.FindAsync(id);
             if (item_old == null)
             {
-                return NotFound();
+                return NotFound("El item no existe.");
             }
 
             item_old.item_qty = item_new.item_qty;
