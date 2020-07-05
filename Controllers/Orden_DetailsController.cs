@@ -115,13 +115,21 @@ namespace SmallWarehouseBackEnd.Controllers
             var orden = await _context.Orden.FindAsync(orden_details.orden_id);
             if (item == null || orden == null)
             {
-                return NotFound();
+                return NotFound("Error: La llave foranea a la que se hace referencia no existe. Revisar el item o la orden de referencia.");
             }
-            if (orden_details.orden_details_qty <= 0 || orden.orden_status != 1) // Tiene que comprar algo y la orden debe estar en proceso (1).
+            if (orden_details.orden_details_qty <= 0) // Tiene que comprar algo y la orden debe estar en proceso (1).
             {
-                return BadRequest(); 
+                return BadRequest("El mínimo de artículos es uno, si compra.");
+            } else if ( item.item_qty < orden_details.orden_details_qty)
+            {
+                return BadRequest("Ha solicitado más artículos de los que se encuentran disponibles.");
+
+            } else if ( orden.orden_status != 1 )
+            {
+                return BadRequest("La orden debe estar en proceso, no cancelada ni pagada para agregar otro artículo.");
             }
             orden_details.orden_details_status = 1; // En proceso de compra.
+            item.item_qty = item.item_qty - orden_details.orden_details_qty; // Modificando el stock.
             _context.Orden_Details.Add(orden_details);
             await _context.SaveChangesAsync();
 
