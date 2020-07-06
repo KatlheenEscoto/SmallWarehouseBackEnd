@@ -166,7 +166,7 @@ namespace SmallWarehouseBackEnd.Controllers
         /* Documentación base: https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-3.1&fbclid=IwAR0s4OqoCf9O9SZY4g8UhMWke7iU4X3j6nlkU0XUZjgZBmf6DA8M71_hmA8 */
        
         [HttpGet("index")]
-        public async Task<ActionResult<PaginatedList<Item>>> Index(
+        public async Task<ActionResult<PaginatedList>> Index(
             string currentFilter, 
             string searchString,
             int? pageNumber // Contiene nulos. 
@@ -198,7 +198,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
 
             //return await items.AsNoTracking().ToListAsync();
-            return await PaginatedList<Item>.CreateAsync(items.AsNoTracking(), pageNumber ?? 1, pageSize);
+            return await PaginatedList.CreateAsync(items.AsNoTracking(), pageNumber ?? 1, pageSize);
         }
 
     }
