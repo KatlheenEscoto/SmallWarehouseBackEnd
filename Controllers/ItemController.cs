@@ -166,17 +166,39 @@ namespace SmallWarehouseBackEnd.Controllers
         /* Documentación base: https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-3.1&fbclid=IwAR0s4OqoCf9O9SZY4g8UhMWke7iU4X3j6nlkU0XUZjgZBmf6DA8M71_hmA8 */
        
         [HttpGet("index")]
-        public async Task<ActionResult<IEnumerable<Item>>> Index(string searchString)
+        public async Task<ActionResult<PaginatedList<Item>>> Index(
+            string currentFilter, 
+            string searchString,
+            int? pageNumber // Contiene nulos. 
+            )
         {
+
+            if (searchString != null) // Envio otra cadena para buscar.
+            {
+                pageNumber = 1; // Reiniciamos busqueda.
+            }
+            else
+            {
+                searchString = currentFilter; // Se sigue en la misma busqueda, pero, en otra pagina. 
+            }
+
+            // No digita nada el usuario, buscamos todo.
             var items = from i in _context.Item 
                         select i;
 
+            // No es nula la cadena de busqueda, buscamos.
             if(!String.IsNullOrEmpty(searchString))
             {
                 items = items.Where(i => i.item_sku.Contains(searchString));
             }
 
-            return await items.AsNoTracking().ToListAsync();
+
+
+            int pageSize = 3; // Le especifico un valor para mostrar determinada cantidad de item.
+
+
+            //return await items.AsNoTracking().ToListAsync();
+            return await PaginatedList<Item>.CreateAsync(items.AsNoTracking(), pageNumber ?? 1, pageSize);
         }
 
     }
