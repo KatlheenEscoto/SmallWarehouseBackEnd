@@ -160,5 +160,24 @@ namespace SmallWarehouseBackEnd.Controllers
             }
         }
 
+        /* Búsqueda y paginación */
+
+        // GET: api/Item/index
+        /* Documentación base: https://docs.microsoft.com/en-us/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-3.1&fbclid=IwAR0s4OqoCf9O9SZY4g8UhMWke7iU4X3j6nlkU0XUZjgZBmf6DA8M71_hmA8 */
+       
+        [HttpGet("index")]
+        public async Task<ActionResult<IEnumerable<Item>>> Index(string searchString)
+        {
+            var items = from i in _context.Item 
+                        select i;
+
+            if(!String.IsNullOrEmpty(searchString))
+            {
+                items = items.Where(i => i.item_sku.Contains(searchString));
+            }
+
+            return await items.AsNoTracking().ToListAsync();
+        }
+
     }
 }
