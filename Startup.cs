@@ -28,6 +28,10 @@ namespace SmallWarehouseBackEnd
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ConnectionString")));
+            services.AddCors( options => options.AddPolicy("AllowWebApp",
+                                         builder => builder.AllowAnyOrigin()
+                                                            .AllowAnyHeader()
+                                                            .AllowAnyMethod()));
             services.AddControllers();
         }
 
@@ -38,6 +42,8 @@ namespace SmallWarehouseBackEnd
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("AllowWebApp");
 
             app.UseHttpsRedirection();
 
