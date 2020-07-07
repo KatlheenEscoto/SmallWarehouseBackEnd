@@ -185,6 +185,7 @@ namespace SmallWarehouseBackEnd.Controllers
             // No digita nada el usuario, buscamos todo.
             var items = from i in _context.Item 
                         select i;
+            items = items.Where(i => i.item_qty > 0);
 
             // No es nula la cadena de busqueda, buscamos.
             if(!String.IsNullOrEmpty(searchString))
