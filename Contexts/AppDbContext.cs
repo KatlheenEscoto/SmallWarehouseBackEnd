@@ -18,7 +18,7 @@ namespace SmallWarehouseBackEnd.Contexts
 
         public DbSet<Orden> Orden { get; set; }
 
-        public DbSet<SmallWarehouseBackEnd.Models.Orden_Details> Orden_Details { get; set; }
+        public DbSet<Orden_Details> Orden_Details { get; set; }
 
         public DbSet<Usuario> Usuario { get; set; }
     }

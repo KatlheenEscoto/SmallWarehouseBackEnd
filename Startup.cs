@@ -13,9 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using SmallWarehouseBackEnd.Contexts;
 
 namespace SmallWarehouseBackEnd
@@ -66,17 +64,10 @@ namespace SmallWarehouseBackEnd
 
             // Context.
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ConnectionString")));
-
-
-            // LOGs.
-            //LOGs - Serilog RollingLog
-            Log.Logger = new LoggerConfiguration()
-               .ReadFrom.Configuration(Configuration)
-               .CreateLogger();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -93,8 +84,6 @@ namespace SmallWarehouseBackEnd
             app.UseAuthorization();
 
             app.UseCors("AllowWebApp");
-
-            loggerFactory.AddSerilog();
 
             app.UseEndpoints(endpoints =>
             {

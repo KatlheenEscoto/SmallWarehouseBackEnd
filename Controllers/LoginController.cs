@@ -16,18 +16,16 @@ using SmallWarehouseBackEnd.Models;
 
 namespace SmallWarehouseBackEnd.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<LoginController> _logger;
         private readonly AppDbContext _context;
 
         public LoginController(IConfiguration configuration, ILogger<LoginController> logger, AppDbContext context)
         {
             _configuration = configuration;
-            _logger = logger;
             _context = context;
         }
 
@@ -52,7 +50,6 @@ namespace SmallWarehouseBackEnd.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError("Login: " + e.Message, e);
                 return StatusCode((int)System.Net.HttpStatusCode.InternalServerError, e.Message);
             }
         }
