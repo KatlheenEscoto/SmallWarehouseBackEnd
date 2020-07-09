@@ -31,12 +31,19 @@ namespace SmallWarehouseBackEnd.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult Login(Usuario usuario)
+        public async Task<IActionResult> Login(Usuario usuario)
         {
             try
             {
+                // Buscando usuario.
+                var usuario_bd = _context.Usuario.Where(u => u.usuario_username == usuario.usuario_username).FirstOrDefault();
+                if (usuario_bd == null)
+                {
+                    return Ok("El usuario no existe.");
+                }
+
                 // Verificar usuario y contrasenia.
-                if (usuario.usuario_username != "katlheen" || usuario.usuario_password != "123")
+                if (usuario.usuario_username != usuario_bd.usuario_username || usuario.usuario_password != usuario_bd.usuario_password)
                 {
                     return BadRequest("Usuario o contrasenia incorrectos");
                 }
