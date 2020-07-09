@@ -21,5 +21,7 @@ namespace SmallWarehouseBackEnd.Contexts
         public DbSet<Orden_Details> Orden_Details { get; set; }
 
         public DbSet<Usuario> Usuario { get; set; }
+
+        public DbSet<Rol> Rol { get; set; }
     }
 }

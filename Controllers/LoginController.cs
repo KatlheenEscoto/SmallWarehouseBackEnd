@@ -37,19 +37,26 @@ namespace SmallWarehouseBackEnd.Controllers
             {
                 // Buscando usuario.
                 var usuario_bd = _context.Usuario.Where(u => u.usuario_username == usuario.usuario_username).FirstOrDefault();
+                var rol = await _context.Rol.FindAsync(usuario_bd.rol_id);
+
                 if (usuario_bd == null)
                 {
                     return Ok("El usuario no existe.");
+                } else if (rol == null)
+                {
+                    return Ok("El usuario no tiene asignado ningun rol.");
                 }
 
                 // Verificar usuario y contrasenia.
                 if (usuario.usuario_username != usuario_bd.usuario_username || usuario.usuario_password != usuario_bd.usuario_password)
                 {
                     return BadRequest("Usuario o contrasenia incorrectos");
-                }
+                } 
+
+
 
                 // Generar token
-                var token = GenerarToken(usuario);
+                var token = GenerarToken(usuario_bd, rol);
                 return Ok(new
                 {
                     response = new JwtSecurityTokenHandler().WriteToken(token)
@@ -62,13 +69,13 @@ namespace SmallWarehouseBackEnd.Controllers
         }
 
         [HttpGet("obtener")]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public string obtener()
         {
             return "Hola";
         }
 
-        private JwtSecurityToken GenerarToken(Usuario usuario)
+        private JwtSecurityToken GenerarToken(Usuario usuario, Rol rol)
         {
             string ValidIssuer = _configuration["ApiAuth:Issuer"];
             string ValidAudience = _configuration["ApiAuth:Audience"];
@@ -83,7 +90,7 @@ namespace SmallWarehouseBackEnd.Controllers
             var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.usuario_username),
-                new Claim(JwtRegisteredClaimNames.Email, usuario.usuario_email),
+                new Claim (ClaimTypes.Role, rol.rol_name)
             };
 
 

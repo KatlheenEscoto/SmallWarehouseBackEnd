@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace SmallWarehouseBackEnd.Models
 
         public string usuario_password { get; set; }
 
-        public string usuario_email { get; set; }
+        [ForeignKey("rol_id")]
+        public int rol_id { get; set; }
     }
 }
