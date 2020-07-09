@@ -72,8 +72,19 @@ namespace SmallWarehouseBackEnd.Controllers
         [Authorize(Roles = "admin")]
         public string obtener()
         {
-            return "Hola";
+            return "Prueba";
         }
+
+        [HttpPost("welcome")]
+        [Authorize]
+        public string welcome()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            var username = claim[1].Value;
+            return "Welcome " + username;
+        }
+
 
         private JwtSecurityToken GenerarToken(Usuario usuario, Rol rol)
         {
