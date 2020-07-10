@@ -23,5 +23,7 @@ namespace SmallWarehouseBackEnd.Contexts
         public DbSet<Usuario> Usuario { get; set; }
 
         public DbSet<Rol> Rol { get; set; }
+
+        public DbSet<Log> Log { get; set; }
     }
 }

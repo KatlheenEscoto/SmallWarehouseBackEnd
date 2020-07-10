@@ -83,6 +83,19 @@ namespace SmallWarehouseBackEnd.Controllers
             orden_details.orden_details_status = 1; // En proceso de compra.
             item.item_qty = item.item_qty - orden_details.orden_details_qty; // Modificando el stock.
             _context.Orden_Details.Add(orden_details);
+
+            // Log.
+            Log log = new Log {
+                log_date = DateTime.Today,
+                orden_details_qty = orden_details.orden_details_qty,
+                log_status = orden_details.orden_details_status,
+                item_sku = item.item_sku,
+                item_id = item.item_id,
+                usuario_id = 1
+            };
+            _context.Log.Add(log);
+
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrden_Details", new { id = orden_details.orden_details_id }, orden_details);
@@ -112,6 +125,18 @@ namespace SmallWarehouseBackEnd.Controllers
 
             try
             {
+                // Log.
+                Log log = new Log
+                {
+                    log_date = DateTime.Today,
+                    orden_details_qty = orden_details_delete.orden_details_qty,
+                    log_status = orden_details_delete.orden_details_status,
+                    item_sku = item.item_sku,
+                    item_id = item.item_id,
+                    usuario_id = 1
+                };
+                _context.Log.Add(log);
+
                 await _context.SaveChangesAsync();
                 return orden_details_delete;
             }
