@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Orden
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Orden>>> GetOrden()
         {
             return await _context.Orden.ToListAsync();
@@ -30,6 +32,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Orden/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Orden>> GetOrden(int id)
         {
             var orden = await _context.Orden.FindAsync(id);
@@ -59,6 +62,7 @@ namespace SmallWarehouseBackEnd.Controllers
         // POST: api/orden
         // Agregar Orden.
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Orden>> PostOrden(Orden orden)
         {
             orden.orden_total_qty = 0; // Todavía no ha comprado nada.
@@ -71,6 +75,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // DELETE: api/orden/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Orden>> DeleteOrden(int id)
         {
 
@@ -106,6 +111,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // PUT: api/orden/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<Orden>> PutOrden(int id)
         {
 
@@ -117,10 +123,12 @@ namespace SmallWarehouseBackEnd.Controllers
             }
 
             orden.orden_status = 2; // Orden comprada.
+            orden.orden_total_qty = 0;
             var orden_details = await _context.Orden_Details.Where(d => d.orden_id == orden.orden_id && d.orden_details_status == 1).ToListAsync();
             foreach (var detail in orden_details)
             {
                 detail.orden_details_status = 2; // Estado comprado.
+                orden.orden_total_qty = orden.orden_total_qty + detail.orden_details_qty;
             }
 
             try

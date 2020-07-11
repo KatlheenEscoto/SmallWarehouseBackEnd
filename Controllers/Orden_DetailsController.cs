@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Orden_Details
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Orden_Details>>> GetOrden_Details()
         {
             return await _context.Orden_Details.ToListAsync();
@@ -30,6 +32,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Orden_Details/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Orden_Details>> GetOrden_Details(int id)
         {
             var orden_Details = await _context.Orden_Details.FindAsync(id);
@@ -60,6 +63,7 @@ namespace SmallWarehouseBackEnd.Controllers
         // POST: api/Orden_Details
         // Agregar detalle de orden.
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Orden_Details>> PostOrden_Details(Orden_Details orden_details)
         {
             // Verificando si existen las claves foraneas.
@@ -104,6 +108,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // DELETE: api/Orden_Details/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Orden_Details>> DeleteOrden_Details(int id)
         {
             /* Cancelando una determinada orden de producto. */

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Log
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Log>>> GetLog()
         {
             return await _context.Log.ToListAsync();
@@ -30,6 +32,7 @@ namespace SmallWarehouseBackEnd.Controllers
 
         // GET: api/Log/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Log>> GetLog(int id)
         {
             var log = await _context.Log.FindAsync(id);
